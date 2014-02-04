@@ -11,3 +11,4 @@ TODO
 * Add support of russian alphabet
 * Make a small code refactoring
 * Make a normal readme 
+* Add smth like interface
