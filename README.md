@@ -1,7 +1,13 @@
-Now the app is only able to encrypt messages:
+To encrypt/dectypt messages:
 ```python
 import aes
 
-cipher = eas.encrypt(message, key)
+cipher = aes.encrypt(message, key)
+message = aes.decrypt(cipher, key)
 ```
-Decription will be added later, normal readme too
+While it doesn't work correctly with russian symbols
+TODO
+====
+* Add support of russian alphabet
+* Make a small code refactoring
+* Make a normal readme 
