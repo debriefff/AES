@@ -48,177 +48,93 @@ rcon = [['0x01', '0x02', '0x04', '0x08', '0x10', '0x20', '0x40', '0x80', '0x1b',
         ['0x00', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00', '0x00']
        ]
 
-def encrypt(message, key):
-    """Function encrypts the message according to AES(128) algorithm using the key
+def encrypt(input_bytes, key):
+    """Function encrypts the input_bytes according to AES(128) algorithm using the key
+
+    Args:
+       input_bytes -- list of int less than 255, ie list of bytes. Length of input_bytes is constantly 16
+       key -- a strig of plain text. Do not forget it! The same string is used in decryption   
 
     Returns:
-        List of hexidecimal numbers. They are ASCII codes.
+        List of int
 
-    """
+    """ 
 
     # let's prepare our enter data: State array and KeySchedule
-    # if len of the message less than 16, full gaps with '0x00'
-    state = [[] for j in range(nb)] 
-    hex_symbols = [hex(ord(symbol)) for symbol in message]
-
-    if len(hex_symbols) < 16:
-        for i in range(16 - len(hex_symbols)):
-            hex_symbols.append('0x01')
-
-    '''
-    hex_symbols = ['0x00', '0x11', '0x22', '0x33', '0x44', '0x55', '0x66',
-                   '0x77', '0x88', '0x99', '0xaa', '0xbb', '0xcc', '0xdd',
-                   '0xee', '0xff']
-    '''
-
+    state = [[] for j in range(4)]
     for r in range(4):
         for c in range(nb):
-            state[r].append(hex_symbols[r + 4*c])
+            state[r].append(hex(input_bytes[r + 4*c]))
 
     key_schedule = key_expansion(key)
-
-    print('iteration 0:')
-    print('Input: ')
-    for i in range(len(state)):
-        print(state[i])
     
     state = add_round_key(state, key_schedule)
     state = kill_chaos_in(state)
 
-    print('after AddRoundKey:')
-    for i in range(len(state)):
-        print(state[i])
-
     for rnd in range(1, nr):
-        print('iteration ', rnd)
 
         state = sub_bytes(state)
-        print('after SubBytes:')
-        for i in range(len(state)):
-            print(state[i])
-
         state = shift_rows(state)
-        print('after ShiftRows:')
-        for i in range(len(state)):
-            print(state[i])
-
         state = mix_columns(state)
-        print('after MixColumns:')
-        for i in range(len(state)):
-            print(state[i])
-
         state = add_round_key(state, key_schedule, rnd)
-        print('after AddRoundKey:')
-        for i in range(len(state)):
-             print(state[i])
 
         state = kill_chaos_in(state)
 
-    print('iteration last:')
     state = sub_bytes(state)
-    print('after SubBytes:')
-    for i in range(len(state)):
-        print(state[i])
-    
     state = shift_rows(state)
-    print('after ShiftRows:')
-    for i in range(len(state)):
-        print(state[i])
-
     state = add_round_key(state, key_schedule, rnd + 1)
-    print('after AddRoundKey:')
-    for i in range(len(state)):
-         print(state[i])
 
-    print('result!')
-    for i in range(len(state)):
-        print(state[i])
-
-    output = [None for i in range(nb*nb)]
+    output = [None for i in range(4*nb)]
     for r in range(4):
         for c in range(nb):
-            output[r + 4*c] = hex(eval(state[r][c]))
+            output[r + 4*c] = eval(state[r][c])
 
-    # If message is less than 16 symbols, gaps is fulled with '0x00' and we shouldn't see them
-    return output[:len(message)]
+    return output
 
 def decrypt(cipher, key):
+    """Function decrypts the cipher according to AES(128) algorithm using the key
+
+    Args:
+       cipher -- list of int less than 255, ie list of bytes
+       key -- a strig of plain text. Do not forget it! The same string is used in decryption 
+
+    Returns:
+        List of int
+
+    """ 
 
     # let's prepare our algorithm enter data: State array and KeySchedule
-    # if len of the cipher less than 16, full gaps with '0x00'
-    pre_state = cipher[:] 
-
-    if len(pre_state) < 16:
-        for i in range(16 - len(pre_state)):
-            pre_state.append('0x01')
-
     state = [[] for i in range(nb)]
     for r in range(4):
         for c in range(nb):
-            state[r].append(pre_state[r + 4*c])
+            state[r].append(hex(cipher[r + 4*c]))
 
     key_schedule = key_expansion(key)
-
-    print('iteration 0:')
-    print('Input: ')
-    for i in range(len(state)):
-        print(state[i])
     
     state = add_round_key(state, key_schedule, nr)
     state = kill_chaos_in(state)
 
-    print('After AddRoundKey:')
-    for i in range(len(state)):
-        print(state[i])
-
     rnd = nr - 1
     while rnd >= 1:
-        print('iteration ', rnd)
+
         state = shift_rows(state, inv=True)
-        print('after ShiftRows:')
-        for i in range(len(state)):
-            print(state[i])
-
-
         state = sub_bytes(state, inv=True)
-        print('after SubBytes:')
-        for i in range(len(state)):
-            print(state[i])
-
         state = add_round_key(state, key_schedule, rnd)
-        print('after AddRoundKey:')
-        for i in range(len(state)):
-            print(state[i])
-
         state = mix_columns(state, inv=True)
-        print('after MixColumns:')
-        for i in range(len(state)):
-            print(state[i])
-
+        
         state = kill_chaos_in(state)
         rnd -= 1
 
     state = shift_rows(state, inv=True)
-    print('after ShiftRows:')
-    for i in range(len(state)):
-        print(state[i])
     state = sub_bytes(state, inv=True)
-    print('after SubBytes:')
-    for i in range(len(state)):
-        print(state[i])
-
     state = add_round_key(state, key_schedule, rnd)
 
-    print('Output: ')
-    for i in range(len(state)):
-        print(state[i])
-
-    output = [None for i in range(nb*nb)]
+    output = [None for i in range(4*nb)]
     for r in range(4):
         for c in range(nb):
-            output[r + 4*c] = chr(eval(state[r][c]))
+            output[r + 4*c] = eval(state[r][c])
 
-    return ''.join(output)[:len(cipher)]
+    return output
 
 
 def sub_bytes(state, inv=False):
@@ -226,10 +142,11 @@ def sub_bytes(state, inv=False):
     according the algorithm: in hexadecimal notation an element from State 
     consist of two values: 0x<val1><val2>. We take elem from crossing 
     val1-row and val2-column in Sbox and put it instead of the element in State.
-    If decryption-transformation is on (inv == True) uses InvSbox instead Sbox.
+    If decryption-transformation is on (inv == True) it uses InvSbox instead Sbox.
 
     Args:
-        inv: value == False means function is encryption-transformation. True - decryption-transformation
+        inv -- If value == False means function is encryption-transformation. 
+               True - decryption-transformation
 
     """
 
@@ -256,12 +173,12 @@ def sub_bytes(state, inv=False):
 
 
 def shift_rows(state, inv=False):
-    """That transformation shift rows of State: the second rotate over 1 bytes,
+    """That transformation shifts rows of State: the second rotate over 1 bytes,
     the third rotate over 2 bytes, the fourtg rotate over 3 bytes. The transformation doesn't
-    touch the first row.
+    touch the first row. When encrypting transformation uses left shift, in decription - right shift
 
     Args:
-        inv: value == False means function is encryption mode. True - decryption mode
+        inv: If value == False means function is encryption mode. True - decryption mode
 
     """
 
@@ -280,12 +197,13 @@ def shift_rows(state, inv=False):
 
 
 def mix_columns(state, inv=False):
-    """That transformation multiplyes every column of State with 
-    a fixed polinomial a(x) = {03}x**3 + {01}x**2 + {01}x + {02} in Galua field. 
-    Detailed information in AES standart.
+    """When encrypting transformation multiplyes every column of State with 
+    a fixed polinomial a(x) = {03}x**3 + {01}x**2 + {01}x + {02} in Galua field.
+    When decrypting multiplies with a'(x) = {0b}x**3 + {0d}x**2 + {09}x + {0e}
+    Detailed information in AES standart. 
 
     Args:
-        inv: value == False means function is encryption mode. True - decryption mode
+        inv: If value == False means function is encryption mode. True - decryption mode
 
     """
 
@@ -309,82 +227,6 @@ def mix_columns(state, inv=False):
  
     return state
 
-# Small helpful functions block
-
-def left_shift(array, count):
-    """Rotate the array over count times"""
-
-    res = array[:]
-    for i in range(count):
-        temp = [res[i] for i in range(1, len(array))]
-        temp.append(res[0])
-        res[:] = temp[:]
-
-    return res
-
-def right_shift(array, count):
-    """Rotate the array over count times"""
-
-    res = array[:]
-    for i in range(count):
-        tmp = res[:-1]
-        tmp.insert(0, res[-1])
-        res[:] = tmp[:]
-
-    return res
-
-
-def kill_chaos_in(array):
-
-    array = array[:]
-
-    for row in range(len(array)):
-        for col in range(len(array[row])):
-            if array[row][col][-2] == 'x':
-                array[row][col] = array[row][col][:-1] + '0' + array[row][col][-1]
-
-    return array
-
-def mul_by_02(num):
-    """The function multiplies by 2 in Galua space"""
-
-    if num < 0x80:
-        res =  (num << 1)
-    else:
-        res =  (num << 1)^0x1b
-
-    return res % 0x100
-
-def mul_by_03(num):
-    """The function multiplies by 3 in Galua space
-    example: 0x03*num = (0x02 + 0x01)num = num*0x02 + num
-    Addition in Galua field is oparetion XOR
-
-    """
-    return (mul_by_02(num)^num)
-
-def mul_by_09(num):
-    # n*09 = n(03 + 03 + 03)
-    #return mul_by_03(num)^mul_by_03(num)^mul_by_03(num)
-    return mul_by_02(mul_by_02(mul_by_02(num)))^num
- 
-def mul_by_0b(num):
-    # n*0b = n(09 + 02)
-    #return mul_by_09(num)^mul_by_02(num)
-    return mul_by_02(mul_by_02(mul_by_02(num)))^mul_by_02(num)^num
-
-def mul_by_0d(num):
-    # n*0d = n(0b + 02)
-    #return mul_by_0b(num)^mul_by_02(num)
-    return mul_by_02(mul_by_02(mul_by_02(num)))^mul_by_02(mul_by_02(num))^num
-
-def mul_by_0e(num):
-    # n*0e = n(0d + 01)
-    #return mul_by_0d(num)^num
-    return mul_by_02(mul_by_02(mul_by_02(num)))^mul_by_02(mul_by_02(num))^mul_by_02(num)
-
-# End of small helpful functions block
-
 def key_expansion(key):
     """It makes list of RoundKeys for function AddRoundKey. All details 
     about algorithm is is in AES standart
@@ -392,7 +234,6 @@ def key_expansion(key):
     """
 
     key_symbols = [hex(ord(symbol)) for symbol in key]
-    #key_symbols = ['0x00', '0x01', '0x02', '0x03', '0x04', '0x05', '0x06', '0x07', '0x08' ,'0x09', '0x0a', '0x0b', '0x0c', '0x0d', '0x0e', '0x0f',]
  
     # ChipherKey shoul contain 16 symbols to full 4*4 table. If it's less
     # complement key with "0x0"
@@ -401,17 +242,10 @@ def key_expansion(key):
             key_symbols.append('0x01')
 
     # make ChipherKey(which is base of KeySchedule)
-    key_schedule = [[], [], [], []]     
+    key_schedule = [[] for i in range(nb)]     
     for r in range(4):
         for c in range(nb):
             key_schedule[r].append(key_symbols[r + 4*c])
-
-    '''
-    key_schedule = [['0x2b', '0x28', '0xab', '0x09'],
-                    ['0x7e', '0xae', '0xf7', '0xcf'],
-                    ['0x15', '0xd2', '0x15', '0x4f'],
-                    ['0x16', '0xa6', '0x88', '0x3c']]
-    '''
 
     # Comtinue to fill KeySchedule
     for col in range(nb, nb*(nr + 1)): # col - column number
@@ -467,16 +301,78 @@ def add_round_key(state, key_schedule, round=0):
 
     return state
 
-if __name__ == '__main__':
-    
-    message = '&*(@!!?tttttttttttttt6'
-    key = 'banana'
-    cipher = encrypt(message, key)
-    print('-------------------------------')
+# Small helpful functions block
 
-    decoded_cipher = decrypt(cipher, key)
-    print('enter message: ', message)
-    print('cipher: ', cipher)
-    print('decoded cipher: ',decoded_cipher)
+def left_shift(array, count):
+    """Rotate the array over count times"""
 
+    res = array[:]
+    for i in range(count):
+        temp = [res[i] for i in range(1, len(array))]
+        temp.append(res[0])
+        res[:] = temp[:]
 
+    return res
+
+def right_shift(array, count):
+    """Rotate the array over count times"""
+
+    res = array[:]
+    for i in range(count):
+        tmp = res[:-1]
+        tmp.insert(0, res[-1])
+        res[:] = tmp[:]
+
+    return res
+
+def kill_chaos_in(array):
+    # Needed for correct work of SubBytes()
+
+    array = array[:]
+
+    for row in range(len(array)):
+        for col in range(len(array[row])):
+            if array[row][col][-2] == 'x':
+                array[row][col] = array[row][col][:-1] + '0' + array[row][col][-1]
+
+    return array
+
+def mul_by_02(num):
+    """The function multiplies by 2 in Galua space"""
+
+    if num < 0x80:
+        res =  (num << 1)
+    else:
+        res =  (num << 1)^0x1b
+
+    return res % 0x100
+
+def mul_by_03(num):
+    """The function multiplies by 3 in Galua space
+    example: 0x03*num = (0x02 + 0x01)num = num*0x02 + num
+    Addition in Galua field is oparetion XOR
+
+    """
+    return (mul_by_02(num)^num)
+
+def mul_by_09(num):
+    # n*09 = n(03 + 03 + 03)
+    #return mul_by_03(num)^mul_by_03(num)^mul_by_03(num)
+    return mul_by_02(mul_by_02(mul_by_02(num)))^num
+ 
+def mul_by_0b(num):
+    # n*0b = n(09 + 02)
+    #return mul_by_09(num)^mul_by_02(num)
+    return mul_by_02(mul_by_02(mul_by_02(num)))^mul_by_02(num)^num
+
+def mul_by_0d(num):
+    # n*0d = n(0b + 02)
+    #return mul_by_0b(num)^mul_by_02(num)
+    return mul_by_02(mul_by_02(mul_by_02(num)))^mul_by_02(mul_by_02(num))^num
+
+def mul_by_0e(num):
+    # n*0e = n(0d + 01)
+    #return mul_by_0d(num)^num
+    return mul_by_02(mul_by_02(mul_by_02(num)))^mul_by_02(mul_by_02(num))^mul_by_02(num)
+
+# End of small helpful functions block
