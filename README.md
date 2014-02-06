@@ -14,7 +14,7 @@ import aes128
 cipher = aes128.encrypt(input_bytes, key)
 message = aes128.decrypt(cipher, key)
 ```
-Input and output types is described in doc strings. I assume you won't use not the English alphabet for the secret key, because ```ord()``` of symbols should return less than 255, ie we can keep it using just 1 byte.
+Input and output types is described in doc strings. I assume you won't use not the English alphabet for the secret key, because ```ord()``` of symbols should return less than 255, ie we can keep it using just 1 byte per symbol.
 
 The second way is to run *main.py* which provides a shy CLI-interface. Just run it and follow the instructions.
 
