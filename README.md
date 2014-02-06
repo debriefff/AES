@@ -19,4 +19,4 @@ Input and output types is described in doc strings. I assume you won't use not t
 The second way is to run *main.py* which provides a shy CLI-interface. Just run it and follow the instructions.
 
 ##Author
-If you want smth to say - feel free to contact me
+If you want give me feedback - feel free to contact
