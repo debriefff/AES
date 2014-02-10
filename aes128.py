@@ -247,23 +247,23 @@ def key_expansion(key):
 
     key_symbols = [ord(symbol) for symbol in key]
  
-    # ChipherKey shoul contain 16 symbols to full 4*4 table. If it's less
-    # complement key with "0x01"
-    if len(key_symbols) < 16:
-        for i in range(16 - len(key_symbols)):
+    # ChipherKey shoul contain 16 symbols to fill 4*4 table. If it's less
+    # complement the key with "0x01"
+    if len(key_symbols) < 4*nk:
+        for i in range(4*nk - len(key_symbols)):
             key_symbols.append(0x01)
 
     # make ChipherKey(which is base of KeySchedule)
-    key_schedule = [[] for i in range(nb)]     
+    key_schedule = [[] for i in range(4)]     
     for r in range(4):
-        for c in range(nb):
+        for c in range(nk):
             key_schedule[r].append(key_symbols[r + 4*c])
 
     # Comtinue to fill KeySchedule
-    for col in range(nb, nb*(nr + 1)): # col - column number
+    for col in range(nk, nb*(nr + 1)): # col - column number
         if col % nk == 0:
             # take shifted (col - 1)th column...
-            tmp = [key_schedule[row][col-1] for row in range(1, nb)]
+            tmp = [key_schedule[row][col-1] for row in range(1, 4)]
             tmp.append(key_schedule[0][col-1])
 
             # change its elements using Sbox-table like in SubBytes...
@@ -274,16 +274,15 @@ def key_expansion(key):
                 tmp[j] = sbox_elem
 
             # and finally make XOR of 3 columns
-            for i in range(nk):
-                s = key_schedule[i][col - 4]^tmp[i]^rcon[i][int(col/nk - 1)]
-                
-                key_schedule[i].append(s)
+            for row in range(4):
+                s = key_schedule[row][col - 4]^tmp[row]^rcon[row][col/nk - 1)]
+                key_schedule[row].append(s)
 
         else:
             # just make XOR of 2 columns
-            for i in range(nk):
-                s = key_schedule[i][col - 4]^key_schedule[i][col - 1]
-                key_schedule[i].append(s)
+            for row in range(4):
+                s = key_schedule[row][col - 4]^key_schedule[row][col - 1]
+                key_schedule[row].append(s)
 
     return key_schedule
 
@@ -295,11 +294,11 @@ def add_round_key(state, key_schedule, round=0):
     """
     
     for col in range(nk):
-        # nk*round is a shift which indicates start of a part of the KeySchedule
-        s0 = state[0][col]^key_schedule[0][nk*round + col]
-        s1 = state[1][col]^key_schedule[1][nk*round + col]
-        s2 = state[2][col]^key_schedule[2][nk*round + col]
-        s3 = state[3][col]^key_schedule[3][nk*round + col]
+        # nb*round is a shift which indicates start of a part of the KeySchedule
+        s0 = state[0][col]^key_schedule[0][nb*round + col]
+        s1 = state[1][col]^key_schedule[1][nb*round + col]
+        s2 = state[2][col]^key_schedule[2][nb*round + col]
+        s3 = state[3][col]^key_schedule[3][nb*round + col]
 
         state[0][col] = s0
         state[1][col] = s1
