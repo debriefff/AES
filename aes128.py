@@ -275,7 +275,7 @@ def key_expansion(key):
 
             # and finally make XOR of 3 columns
             for row in range(4):
-                s = key_schedule[row][col - 4]^tmp[row]^rcon[row][col/nk - 1)]
+                s = (key_schedule[row][col - 4])^(tmp[row])^(rcon[row][int(col/nk - 1)])
                 key_schedule[row].append(s)
 
         else:

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     while True:
         print('Enter full name of file')
         input_path = os.path.abspath(input())
-        
+
         if os.path.isfile(input_path):
             break
         else:
@@ -43,7 +43,7 @@ if __name__ == '__main__':
                 continue
         
         break
-    print('\r\n Please, wait...')
+    print('\r\nPlease, wait...')
 
     time_before = time.time()
 
