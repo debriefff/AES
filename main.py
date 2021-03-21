@@ -99,7 +99,7 @@ if __name__ == '__main__':
                     temp.append(0)
                 temp.append(1)
                 decrypted_part = aes128.encrypt(temp, key)
-                decrypted_data.extend(crypted_part) 
+                decrypted_data.extend(temp) 
 
         out_path = os.path.join(os.path.dirname(input_path) , 'decrypted_' + os.path.basename(input_path))
 
