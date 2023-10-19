@@ -6,6 +6,11 @@ My tool works only with 128 bit length key, ie your secret key should be less th
 
 FIXED AND UPGRADED by Mr. JS (October 2023)
 
+## Requirements
+
+Python 3.11
+No third party libraries
+
 ## How to use
 
 Now it's simple after my upgrade of this project:
