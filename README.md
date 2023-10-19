@@ -7,20 +7,21 @@ My tool works only with 128 bit length key, ie your secret key should be less th
 
 ## How to use
 
-The tool is able to encrypt anything which consist of bytes, type of file doesn't matter.
-The first way is to put *aes128.py* in project directoty or somewhere in PYTHON PATH and import
+Now it's simple after my upgrade of this project:
 
 ```python
-import aes128
+from aes import run, Direction
 
-cipher = aes128.encrypt(input_bytes, key)
-message = aes128.decrypt(cipher, key)
+pwd='1234567890'
+data_source = 'This is a text string #!\nЭто новая текстовая строка №!'
+print(f'SOURCE:\n{data_source}')
+data_encrypted = run(Direction.ENCRYPT, data_source, pwd)
+print(f'STORAGE(source=>encrypted):\n{data_encrypted}')
+data_decrypted = run(Direction.DECRYPT, data_encrypted, pwd)
+print(f'RESULT (source=>encrypted=>decrypted):\n{data_decrypted}')
 ```
-
-Input and output types is described in doc strings. I assume you won't use not the English alphabet for the secret key, because ```ord()``` of symbols should return less than 255, ie we can keep it using just 1 byte per symbol.
-
-The second way is to run *main.py* which provides a shy CLI-interface. Just run it and follow the instructions.
+Now it works in Python 3.11 environment
 
 ## Author
 
-If you want give me feedback - feel free to contact
+Mr. JS
