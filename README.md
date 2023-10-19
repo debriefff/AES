@@ -4,6 +4,10 @@ This tool provides encryption/decrytion according to AES(128) standart. The stan
 My tool works only with 128 bit length key, ie your secret key should be less than 16 symbols. The algorithm has been recognized impregnable even with this key-length.
 [Link to the official document for details](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf) 
 
+## About this fork
+
+The main goal of the fork is to make it simple to use, without adding third-party libraries, and also to adapt the functioning of the project in the environment of a modern version of Python
+
 FIXED AND UPGRADED by Mr. JS (October 2023)
 
 ## Requirements
