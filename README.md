@@ -8,8 +8,7 @@ FIXED AND UPGRADED by Mr. JS (October 2023)
 
 ## Requirements
 
-Python 3.11
-No third party libraries
+Pure Python 3.11 (No third party libraries are used)
 
 ## How to use
 
