@@ -4,6 +4,7 @@ This tool provides encryption/decrytion according to AES(128) standart. The stan
 My tool works only with 128 bit length key, ie your secret key should be less than 16 symbols. The algorithm has been recognized impregnable even with this key-length.
 [Link to the official document for details](http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf) 
 
+FIXED AND UPGRADED by Mr. JS (October 2023)
 
 ## How to use
 
@@ -13,12 +14,10 @@ Now it's simple after my upgrade of this project:
 from aes import run, Direction
 
 pwd='1234567890'
-data_source = 'This is a text string #!\nЭто новая текстовая строка №!'
-print(f'SOURCE:\n{data_source}')
+data_source = 'This is a text string'
 data_encrypted = run(Direction.ENCRYPT, data_source, pwd)
-print(f'STORAGE(source=>encrypted):\n{data_encrypted}')
 data_decrypted = run(Direction.DECRYPT, data_encrypted, pwd)
-print(f'RESULT (source=>encrypted=>decrypted):\n{data_decrypted}')
+print(f'SOURCE:\n{data_source}\nSTORAGE (source=>encrypted):\n{data_encrypted}\nRESULT (source=>encrypted=>decrypted):\n{data_decrypted}')
 ```
 Now it works in Python 3.11 environment
 
